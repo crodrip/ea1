@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Modelo Econométrico — FEN UChile</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --fen-navy:#002F6C;
+  --fen-red:#C8102E;
+  --fen-gold:#B8952A;
+  --fen-light:#EEF2F7;
+  --fen-mid:#D0DCF0;
+  --text:#1a1a2e;
+  --muted:#5a6a8a;
+  --white:#fff;
+  --border:#c8d4e8;
+  --radius:8px;
+  --font:'Segoe UI',system-ui,sans-serif;
+}
+body{font-family:var(--font);background:var(--fen-light);color:var(--text);min-height:100vh;font-size:14px}
+
+/* ── HEADER ── */
+.header{background:var(--fen-navy);color:#fff;padding:0}
+.header-top{display:flex;align-items:center;gap:14px;padding:10px 24px;border-bottom:3px solid var(--fen-red)}
+.header-logo{display:flex;flex-direction:column;line-height:1.15}
+.header-logo .inst{font-size:10px;letter-spacing:.08em;color:#9ab0d4;text-transform:uppercase}
+.header-logo .faculty{font-size:15px;font-weight:700;color:#fff}
+.header-logo .sub{font-size:10px;color:#9ab0d4}
+.header-badge{margin-left:auto;background:var(--fen-red);color:#fff;font-size:10px;font-weight:700;padding:4px 10px;border-radius:4px;letter-spacing:.06em;text-transform:uppercase}
+.header-nav{display:flex;gap:0;padding:0 24px}
+.nav-tab{background:none;border:none;color:#9ab0d4;font-size:12px;padding:8px 14px;cursor:pointer;border-bottom:2px solid transparent;font-family:var(--font);transition:color .15s}
+.nav-tab.active{color:#fff;border-bottom:2px solid var(--fen-red)}
+.nav-tab:hover{color:#fff}
+
+/* ── LAYOUT ── */
+.main{max-width:1000px;margin:0 auto;padding:16px 14px}
+
+/* ── ECUACIÓN CARD ── */
+.eq-card{background:var(--fen-navy);color:#fff;border-radius:var(--radius);padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.eq-card .eq-label{font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:#9ab0d4;white-space:nowrap}
+.eq-formula{font-family:'Courier New',monospace;font-size:13px;font-weight:600;flex:1;min-width:200px}
+.eq-formula .bc{color:#7fb3f0}
+.eq-formula .vc{color:#7ddc9a}
+.eq-formula .ec{color:#f4a26a}
+.eq-actions{display:flex;gap:6px;margin-left:auto}
+.btn{font-size:11px;padding:5px 10px;border-radius:5px;border:none;cursor:pointer;font-family:var(--font);font-weight:600;transition:opacity .15s}
+.btn:hover{opacity:.85}
+.btn-add{background:var(--fen-red);color:#fff}
+.btn-del{background:#444;color:#fff}
+.btn-sm{font-size:10px;padding:3px 8px}
+
+/* ── PANELS ROW ── */
+.panels-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+@media(max-width:620px){.panels-row{grid-template-columns:1fr}}
+
+.panel{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px}
+.panel-title{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--fen-navy);border-bottom:2px solid var(--fen-mid);padding-bottom:5px;margin-bottom:8px}
+
+/* ── SLIDERS COMPACTOS ── */
+.sl-row{display:flex;align-items:center;gap:6px;margin-bottom:5px}
+.sl-name{font-size:11px;color:var(--muted);width:155px;flex-shrink:0;font-family:'Courier New',monospace}
+input[type=range]{flex:1;height:3px;accent-color:var(--fen-navy);cursor:pointer;margin:0}
+.sl-val{font-size:11px;font-weight:700;color:var(--fen-navy);font-family:'Courier New',monospace;width:48px;text-align:right;flex-shrink:0}
+
+/* ── MÉTRICAS ── */
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px}
+@media(max-width:620px){.metrics{grid-template-columns:repeat(2,1fr)}}
+.metric{background:var(--fen-navy);border-radius:var(--radius);padding:8px 10px}
+.metric-lbl{font-size:9px;text-transform:uppercase;letter-spacing:.06em;color:#9ab0d4;margin-bottom:3px}
+.metric-val{font-size:16px;font-weight:700;color:#fff;font-family:'Courier New',monospace}
+
+/* ── GRÁFICOS ── */
+.charts-row{display:grid;grid-template-columns:2fr 1fr;gap:10px;margin-bottom:10px}
+@media(max-width:620px){.charts-row{grid-template-columns:1fr}}
+.chart-panel{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px}
+.chart-title{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--fen-navy);margin-bottom:8px}
+.chart-wrap{position:relative}
+#wMain{height:220px}
+#wDist{height:220px}
+
+/* ── ECUACIONES ADICIONALES ── */
+.extra-eqs{margin-bottom:10px}
+.extra-eq{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:8px 12px;margin-bottom:8px}
+.extra-eq-header{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.extra-eq-label{font-size:10px;font-weight:700;color:var(--fen-navy);text-transform:uppercase;letter-spacing:.05em;flex:1}
+.extra-eq-formula{font-family:'Courier New',monospace;font-size:12px;color:var(--text);margin-bottom:6px;padding:5px 8px;background:var(--fen-light);border-radius:4px}
+.extra-eq .sl-name{width:130px}
+
+/* ── TABLA ── */
+.tbl-panel{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:10px}
+.tbl-header{display:flex;align-items:center;justify-content:space-between;padding:7px 12px;border-bottom:1px solid var(--border);background:var(--fen-light)}
+.tbl-title{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--fen-navy)}
+table{width:100%;border-collapse:collapse;font-size:12px}
+thead th{padding:6px 10px;text-align:left;color:var(--muted);font-weight:600;font-size:10px;background:#fafbff;border-bottom:1px solid var(--border)}
+tbody td{padding:5px 10px;border-bottom:1px solid #f0f3fa;color:var(--text)}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover td{background:#f5f8ff}
+.num{font-family:'Courier New',monospace;text-align:right}
+.pos{color:#1a6b2e;font-weight:700}
+.neg{color:#8b1a1a;font-weight:700}
+
+/* ── FOOTER ── */
+footer{background:var(--fen-navy);color:#9ab0d4;text-align:center;font-size:10px;padding:10px;margin-top:8px}
+footer span{color:var(--fen-red);font-weight:700}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-top">
+    <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+      <rect width="32" height="32" rx="4" fill="#C8102E"/>
+      <text x="16" y="22" text-anchor="middle" font-size="14" font-weight="900" fill="white" font-family="serif">U</text>
+    </svg>
+    <div class="header-logo">
+      <span class="inst">Universidad de Chile</span>
+      <span class="faculty">Facultad de Economía y Negocios</span>
+      <span class="sub">Departamento de Economía</span>
+    </div>
+    <div class="header-badge">FEN · UChile</div>
+  </div>
+  <div class="header-nav">
+    <button class="nav-tab active">Modelo Lineal</button>
+    <button class="nav-tab" onclick="sendPrompt('Agrega un modelo de regresión logística a la página')">Logístico ↗</button>
+    <button class="nav-tab" onclick="sendPrompt('Explícame el modelo de Mincer econométricamente')">Mincer ↗</button>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- ECUACIÓN PRINCIPAL -->
+  <div class="eq-card">
+    <span class="eq-label">Modelo 1</span>
+    <div class="eq-formula">
+      Y = <span class="bc" id="d-beta">β</span>·X + <span class="bc" id="d-alpha">α</span>·Z + <span class="ec">ε</span>
+      &nbsp;&nbsp;|&nbsp;&nbsp;
+      Z~N(<span class="vc" id="d-mu">μ</span>, <span class="vc" id="d-sig">σ</span>²) &nbsp; ε~N(0, <span class="ec" id="d-se">σε</span>²)
+    </div>
+    <div class="eq-actions">
+      <button class="btn btn-add" onclick="addEquation()">+ Ecuación</button>
+    </div>
+  </div>
+
+  <!-- CONTROLES -->
+  <div class="panels-row">
+    <div class="panel">
+      <div class="panel-title">Parámetros del modelo</div>
+      <div class="sl-row"><span class="sl-name">β (coef. X)</span><input type="range" id="sl-beta" min="-20" max="20" step="0.05" value="1.5"><span class="sl-val" id="vl-beta">1.50</span></div>
+      <div class="sl-row"><span class="sl-name">α (coef. Z)</span><input type="range" id="sl-alpha" min="-20" max="20" step="0.05" value="0.8"><span class="sl-val" id="vl-alpha">0.80</span></div>
+      <div class="sl-row"><span class="sl-name">σ_ε (error std)</span><input type="range" id="sl-se" min="0.01" max="20" step="0.05" value="1.0"><span class="sl-val" id="vl-se">1.00</span></div>
+      <div class="sl-row"><span class="sl-name">X (valor fijo)</span><input type="range" id="sl-x" min="-50" max="50" step="0.1" value="3.0"><span class="sl-val" id="vl-x">3.00</span></div>
+    </div>
+    <div class="panel">
+      <div class="panel-title">Distribución de Z ~ N(μ, σ²)</div>
+      <div class="sl-row"><span class="sl-name">μ_Z (media)</span><input type="range" id="sl-mu" min="-50" max="50" step="0.1" value="2.0"><span class="sl-val" id="vl-mu">2.00</span></div>
+      <div class="sl-row"><span class="sl-name">σ_Z (desv. std)</span><input type="range" id="sl-sig" min="0.01" max="30" step="0.05" value="1.0"><span class="sl-val" id="vl-sig">1.00</span></div>
+      <div class="sl-row"><span class="sl-name">Rango gráfico (±kσ)</span><input type="range" id="sl-k" min="1" max="5" step="0.5" value="3"><span class="sl-val" id="vl-k">3.0</span></div>
+      <div class="sl-row"><span class="sl-name">N puntos curva</span><input type="range" id="sl-n" min="20" max="200" step="10" value="80"><span class="sl-val" id="vl-n">80</span></div>
+    </div>
+  </div>
+
+  <!-- MÉTRICAS -->
+  <div class="metrics">
+    <div class="metric"><div class="metric-lbl">E[Y]</div><div class="metric-val" id="m-ey">—</div></div>
+    <div class="metric"><div class="metric-lbl">SD(Y)</div><div class="metric-val" id="m-sy">—</div></div>
+    <div class="metric"><div class="metric-lbl">Var(Y)</div><div class="metric-val" id="m-vy">—</div></div>
+    <div class="metric"><div class="metric-lbl">|α|·σ_Z</div><div class="metric-val" id="m-az">—</div></div>
+  </div>
+
+  <!-- GRÁFICOS -->
+  <div class="charts-row">
+    <div class="chart-panel">
+      <div class="chart-title">Y vs Z — con banda IC 95%</div>
+      <div class="chart-wrap" id="wMain"><canvas id="cMain" role="img" aria-label="Relación Y vs Z">Gráfico Y vs Z.</canvas></div>
+    </div>
+    <div class="chart-panel">
+      <div class="chart-title">Densidad Z ~ N(μ, σ²)</div>
+      <div class="chart-wrap" id="wDist"><canvas id="cDist" role="img" aria-label="Densidad normal de Z">Distribución Z.</canvas></div>
+    </div>
+  </div>
+
+  <!-- ECUACIONES ADICIONALES -->
+  <div class="extra-eqs" id="extra-eqs"></div>
+
+  <!-- TABLA -->
+  <div class="tbl-panel">
+    <div class="tbl-header">
+      <span class="tbl-title">Tabla de escenarios — Z en μ ± kσ</span>
+    </div>
+    <table>
+      <thead><tr>
+        <th>Escenario Z</th>
+        <th class="num">Z</th>
+        <th class="num">α·Z</th>
+        <th class="num">β·X</th>
+        <th class="num">E[Y|Z]</th>
+        <th class="num">IC 95% inf.</th>
+        <th class="num">IC 95% sup.</th>
+      </tr></thead>
+      <tbody id="tbl-body"></tbody>
+    </table>
+  </div>
+
+</div>
+
+<footer>
+  <span>FEN UChile</span> — Modelo: Y = β·X + α·Z + ε &nbsp;|&nbsp; Z ~ N(μ, σ²) &nbsp;|&nbsp; ε ~ N(0, σε²)
+</footer>
+
+<script>
+// ── Parámetros extra ──
+let extraEqs = [];
+let extraCharts = {};
+let cMain = null, cDist = null;
+
+const sliders = ['beta','alpha','se','x','mu','sig','k','n'];
+
+function g(id){ return document.getElementById(id); }
+function fv(id){ return parseFloat(g('sl-'+id).value); }
+
+function normalPDF(x,mu,s){ const z=(x-mu)/s; return Math.exp(-.5*z*z)/(s*Math.sqrt(2*Math.PI)); }
+
+function update(){
+  const beta=fv('beta'), alpha=fv('alpha'), se=fv('se'), xv=fv('x');
+  const mu=fv('mu'), sig=fv('sig'), k=fv('k'), N=fv('n');
+
+  sliders.forEach(id=>{
+    const val=fv(id);
+    g('vl-'+id).textContent = val.toFixed(Math.abs(val)<10?2:1);
+  });
+
+  g('d-beta').textContent  = beta.toFixed(2);
+  g('d-alpha').textContent = alpha.toFixed(2);
+  g('d-mu').textContent    = mu.toFixed(2);
+  g('d-sig').textContent   = sig.toFixed(2);
+  g('d-se').textContent    = se.toFixed(2);
+
+  const EY = beta*xv + alpha*mu;
+  const VY = alpha*alpha*sig*sig + se*se;
+  const SY = Math.sqrt(VY);
+  g('m-ey').textContent = EY.toFixed(3);
+  g('m-vy').textContent = VY.toFixed(3);
+  g('m-sy').textContent = SY.toFixed(3);
+  g('m-az').textContent = Math.abs(alpha*sig).toFixed(3);
+
+  const zMin = mu - k*sig, zMax = mu + k*sig;
+  const zLabels=[], yMean=[], yUp=[], yLo=[];
+  for(let i=0;i<=N;i++){
+    const z = zMin + (zMax-zMin)*i/N;
+    const y = beta*xv + alpha*z;
+    zLabels.push(z.toFixed(2));
+    yMean.push(+y.toFixed(4));
+    yUp.push(+(y+1.96*se).toFixed(4));
+    yLo.push(+(y-1.96*se).toFixed(4));
+  }
+
+  if(cMain){
+    cMain.data.labels=zLabels;
+    cMain.data.datasets[0].data=yUp;
+    cMain.data.datasets[1].data=yMean;
+    cMain.data.datasets[2].data=yLo;
+    cMain.update();
+  } else {
+    cMain = new Chart(g('cMain'),{
+      type:'line',
+      data:{labels:zLabels,datasets:[
+        {label:'IC 95% sup',data:yUp,borderColor:'rgba(0,47,108,.25)',backgroundColor:'rgba(0,47,108,.07)',borderWidth:1,borderDash:[4,3],pointRadius:0,fill:'+1',tension:.25},
+        {label:'E[Y|Z]',data:yMean,borderColor:'#002F6C',backgroundColor:'transparent',borderWidth:2.5,pointRadius:0,fill:false,tension:.25},
+        {label:'IC 95% inf',data:yLo,borderColor:'rgba(0,47,108,.25)',backgroundColor:'transparent',borderWidth:1,borderDash:[4,3],pointRadius:0,fill:false,tension:.25},
+      ]},
+      options:{responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{labels:{boxWidth:10,font:{size:10}}},
+          tooltip:{callbacks:{title:i=>'Z='+i[0].label,label:i=>i.dataset.label+': '+i.raw}}},
+        scales:{
+          x:{title:{display:true,text:'Z',font:{size:11}},ticks:{maxTicksLimit:7,font:{size:10}},grid:{color:'rgba(0,0,0,0.04)'}},
+          y:{title:{display:true,text:'Y',font:{size:11}},ticks:{font:{size:10}},grid:{color:'rgba(0,0,0,0.04)'}}
+        }}
+    });
+  }
+
+  const dLabels=[], dData=[];
+  for(let i=0;i<=100;i++){
+    const z=zMin+(zMax-zMin)*i/100;
+    dLabels.push(z.toFixed(2));
+    dData.push(+normalPDF(z,mu,sig).toFixed(6));
+  }
+  if(cDist){
+    cDist.data.labels=dLabels;
+    cDist.data.datasets[0].data=dData;
+    cDist.update();
+  } else {
+    cDist = new Chart(g('cDist'),{
+      type:'line',
+      data:{labels:dLabels,datasets:[{label:'f(Z)',data:dData,borderColor:'#C8102E',backgroundColor:'rgba(200,16,46,.1)',borderWidth:2,pointRadius:0,fill:true,tension:.4}]},
+      options:{responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:false},tooltip:{callbacks:{title:i=>'Z='+i[0].label,label:i=>'f(Z)='+i.raw}}},
+        scales:{
+          x:{title:{display:true,text:'Z',font:{size:10}},ticks:{maxTicksLimit:6,font:{size:9}},grid:{color:'rgba(0,0,0,0.04)'}},
+          y:{title:{display:true,text:'Densidad',font:{size:10}},ticks:{font:{size:9}},grid:{color:'rgba(0,0,0,0.04)'}}
+        }}
+    });
+  }
+
+  // Tabla
+  const scen=[
+    {l:'μ − 3σ',z:mu-3*sig},{l:'μ − 2σ',z:mu-2*sig},{l:'μ − σ',z:mu-sig},
+    {l:'μ (media)',z:mu},{l:'μ + σ',z:mu+sig},{l:'μ + 2σ',z:mu+2*sig},{l:'μ + 3σ',z:mu+3*sig}
+  ];
+  const tb = g('tbl-body');
+  tb.innerHTML = scen.map(s=>{
+    const az=alpha*s.z, bx=beta*xv, ey=bx+az;
+    return `<tr>
+      <td>${s.l}</td>
+      <td class="num">${s.z.toFixed(3)}</td>
+      <td class="num ${az>=0?'pos':'neg'}">${az.toFixed(3)}</td>
+      <td class="num">${bx.toFixed(3)}</td>
+      <td class="num ${ey>=0?'pos':'neg'}">${ey.toFixed(3)}</td>
+      <td class="num">${(ey-1.96*se).toFixed(3)}</td>
+      <td class="num">${(ey+1.96*se).toFixed(3)}</td>
+    </tr>`;
+  }).join('');
+
+  // Actualizar ecuaciones extra
+  extraEqs.forEach(eq => updateExtra(eq));
+}
+
+// ── ECUACIONES ADICIONALES ──
+let eqCount = 1;
+const EQ_COLORS = ['#B8952A','#1a6b2e','#6a1a6b','#8b4513','#1a4a6b'];
+
+function addEquation(){
+  eqCount++;
+  const id = 'eq'+eqCount;
+  const color = EQ_COLORS[(eqCount-2) % EQ_COLORS.length];
+  const eq = {
+    id, label:'Modelo '+eqCount, color,
+    beta2:0.5, gamma:1.0, mu2:0, sig2:1.5, rho:0.3,
+    chart:null
+  };
+  extraEqs.push(eq);
+  renderExtraEq(eq);
+  update();
+}
+
+function removeEquation(id){
+  const idx = extraEqs.findIndex(e=>e.id===id);
+  if(idx===-1) return;
+  if(extraEqs[idx].chart){ extraEqs[idx].chart.destroy(); }
+  extraEqs.splice(idx,1);
+  const el = g('extra-'+id);
+  if(el) el.remove();
+}
+
+function renderExtraEq(eq){
+  const div = document.createElement('div');
+  div.className='extra-eq';
+  div.id='extra-'+eq.id;
+  div.innerHTML=`
+    <div class="extra-eq-header">
+      <span class="extra-eq-label" style="color:${eq.color}">${eq.label}</span>
+      <div class="extra-eq-formula" id="fml-${eq.id}">
+        Y₂ = <span id="db2-${eq.id}">${eq.beta2.toFixed(2)}</span>·W + <span id="dg-${eq.id}">${eq.gamma.toFixed(2)}</span>·V + ε₂ &nbsp;|&nbsp; V~N(<span id="dm2-${eq.id}">${eq.mu2}</span>, <span id="ds2-${eq.id}">${eq.sig2}</span>²)
+      </div>
+      <button class="btn btn-del btn-sm" onclick="removeEquation('${eq.id}')">✕ Eliminar</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+      <div>
+        <div class="sl-row"><span class="sl-name" style="width:120px">β₂ (coef. W)</span><input type="range" id="b2-${eq.id}" min="-20" max="20" step="0.05" value="${eq.beta2}"><span class="sl-val" id="vb2-${eq.id}">${eq.beta2.toFixed(2)}</span></div>
+        <div class="sl-row"><span class="sl-name" style="width:120px">γ (coef. V)</span><input type="range" id="gm-${eq.id}" min="-20" max="20" step="0.05" value="${eq.gamma}"><span class="sl-val" id="vgm-${eq.id}">${eq.gamma.toFixed(2)}</span></div>
+        <div class="sl-row"><span class="sl-name" style="width:120px">ρ (correl. Z,V)</span><input type="range" id="rh-${eq.id}" min="-0.99" max="0.99" step="0.01" value="${eq.rho}"><span class="sl-val" id="vrh-${eq.id}">${eq.rho.toFixed(2)}</span></div>
+      </div>
+      <div>
+        <div class="sl-row"><span class="sl-name" style="width:120px">μ_V (media V)</span><input type="range" id="m2-${eq.id}" min="-50" max="50" step="0.1" value="${eq.mu2}"><span class="sl-val" id="vm2-${eq.id}">${eq.mu2.toFixed(2)}</span></div>
+        <div class="sl-row"><span class="sl-name" style="width:120px">σ_V (desv. V)</span><input type="range" id="s2-${eq.id}" min="0.01" max="30" step="0.05" value="${eq.sig2}"><span class="sl-val" id="vs2-${eq.id}">${eq.sig2.toFixed(2)}</span></div>
+      </div>
+    </div>
+    <div class="chart-wrap" style="height:160px"><canvas id="ch-${eq.id}" role="img" aria-label="Gráfico del ${eq.label}">Gráfico ${eq.label}.</canvas></div>
+  `;
+  g('extra-eqs').appendChild(div);
+
+  ['b2','gm','rh','m2','s2'].forEach(pfx=>{
+    const el = g(pfx+'-'+eq.id);
+    if(el) el.addEventListener('input',()=>update());
+  });
+}
+
+function updateExtra(eq){
+  const beta2 = parseFloat(g('b2-'+eq.id)?.value||eq.beta2);
+  const gamma  = parseFloat(g('gm-'+eq.id)?.value||eq.gamma);
+  const rho    = parseFloat(g('rh-'+eq.id)?.value||eq.rho);
+  const mu2    = parseFloat(g('m2-'+eq.id)?.value||eq.mu2);
+  const sig2   = parseFloat(g('s2-'+eq.id)?.value||eq.sig2);
+
+  if(g('vb2-'+eq.id)) g('vb2-'+eq.id).textContent = beta2.toFixed(2);
+  if(g('vgm-'+eq.id)) g('vgm-'+eq.id).textContent = gamma.toFixed(2);
+  if(g('vrh-'+eq.id)) g('vrh-'+eq.id).textContent = rho.toFixed(2);
+  if(g('vm2-'+eq.id)) g('vm2-'+eq.id).textContent = mu2.toFixed(2);
+  if(g('vs2-'+eq.id)) g('vs2-'+eq.id).textContent = sig2.toFixed(2);
+
+  if(g('db2-'+eq.id)) g('db2-'+eq.id).textContent = beta2.toFixed(2);
+  if(g('dg-'+eq.id))  g('dg-'+eq.id).textContent  = gamma.toFixed(2);
+  if(g('dm2-'+eq.id)) g('dm2-'+eq.id).textContent = mu2.toFixed(2);
+  if(g('ds2-'+eq.id)) g('ds2-'+eq.id).textContent = sig2.toFixed(2);
+
+  const mu = fv('mu'), sig = fv('sig'), k = fv('k'), N = fv('n');
+  const zMin=mu-k*sig, zMax=mu+k*sig;
+  const labels=[], data=[];
+  for(let i=0;i<=N;i++){
+    const z=zMin+(zMax-zMin)*i/N;
+    const v = mu2 + rho*(sig2/sig)*(z-mu);
+    const y = beta2*3 + gamma*v;
+    labels.push(z.toFixed(2));
+    data.push(+y.toFixed(4));
+  }
+
+  const canvas = g('ch-'+eq.id);
+  if(!canvas) return;
+  if(eq.chart){
+    eq.chart.data.labels=labels;
+    eq.chart.data.datasets[0].data=data;
+    eq.chart.update();
+  } else {
+    eq.chart = new Chart(canvas,{
+      type:'line',
+      data:{labels,datasets:[{label:'E[Y₂|Z]',data,borderColor:eq.color,backgroundColor:eq.color+'22',borderWidth:2,pointRadius:0,fill:true,tension:.25}]},
+      options:{responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:false},tooltip:{callbacks:{title:i=>'Z='+i[0].label,label:i=>'E[Y₂|Z]='+i.raw}}},
+        scales:{
+          x:{title:{display:true,text:'Z (variable compartida)',font:{size:10}},ticks:{maxTicksLimit:6,font:{size:9}},grid:{color:'rgba(0,0,0,0.04)'}},
+          y:{title:{display:true,text:'Y₂',font:{size:10}},ticks:{font:{size:9}},grid:{color:'rgba(0,0,0,0.04)'}}
+        }}
+    });
+  }
+}
+
+function sendPrompt(t){ if(window.parent && window.parent.postMessage) window.parent.postMessage({type:'sendPrompt',text:t},'*'); }
+
+sliders.forEach(id=>{
+  const el = g('sl-'+id);
+  if(el) el.addEventListener('input',update);
+});
+
+update();
+</script>
+</body>
+</html>
