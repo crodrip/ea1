@@ -6,111 +6,68 @@
 <title>Modelos Econométricos — FEN UChile</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --navy:#002F6C;--red:#C8102E;--gold:#B8952A;
-  --light:#EEF2F7;--mid:#D0DCF0;--white:#fff;
-  --border:#c8d4e8;--muted:#5a6a8a;--text:#1a1a2e;
-  --radius:8px;--font:'Segoe UI',system-ui,sans-serif;
-}
-body{font-family:var(--font);background:var(--light);color:var(--text);font-size:14px}
-
-/* HEADER */
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--navy:#002F6C;--red:#C8102E;--gold:#B8952A;--light:#EEF2F7;--white:#fff;--border:#c8d4e8;--muted:#5a6a8a;--text:#1a1a2e;--r:8px;--f:'Segoe UI',system-ui,sans-serif}
+body{font-family:var(--f);background:var(--light);color:var(--text);font-size:14px}
 .header{background:var(--navy)}
-.header-top{display:flex;align-items:center;gap:12px;padding:10px 20px;border-bottom:3px solid var(--red)}
-.hlogo{display:flex;flex-direction:column;line-height:1.2}
-.hlogo .inst{font-size:9px;letter-spacing:.08em;color:#8aaad4;text-transform:uppercase}
-.hlogo .fac{font-size:14px;font-weight:700;color:#fff}
-.hlogo .dep{font-size:9px;color:#8aaad4}
-.hbadge{margin-left:auto;background:var(--red);color:#fff;font-size:9px;font-weight:700;padding:3px 9px;border-radius:4px;letter-spacing:.06em}
-
-/* MAIN */
+.htop{display:flex;align-items:center;gap:12px;padding:10px 20px;border-bottom:3px solid var(--red)}
+.hlogo .inst{font-size:9px;letter-spacing:.08em;color:#8aaad4;text-transform:uppercase;display:block}
+.hlogo .fac{font-size:14px;font-weight:700;color:#fff;display:block}
+.hlogo .dep{font-size:9px;color:#8aaad4;display:block}
+.hbadge{margin-left:auto;background:var(--red);color:#fff;font-size:9px;font-weight:700;padding:3px 9px;border-radius:4px}
 .main{max-width:1020px;margin:0 auto;padding:14px 12px}
-
-/* TABS modelos */
-.model-tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
-.mtab{border:1px solid var(--border);background:var(--white);color:var(--muted);font-size:11px;font-weight:600;padding:6px 14px;border-radius:6px;cursor:pointer;font-family:var(--font);transition:all .15s}
-.mtab.active{background:var(--navy);color:#fff;border-color:var(--navy)}
-.mtab:hover:not(.active){background:var(--mid)}
-
-/* MODEL PANELS */
-.model-panel{display:none}
-.model-panel.active{display:block}
-
-/* EQ CARD */
-.eq-card{background:var(--navy);color:#fff;border-radius:var(--radius);padding:9px 14px;margin-bottom:10px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.eq-tag{font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:#8aaad4;white-space:nowrap;flex-shrink:0}
-.eq-f{font-family:'Courier New',monospace;font-size:13px;font-weight:600;flex:1}
-.eq-f .bc{color:#7fb3f0}.eq-f .vc{color:#7ddc9a}.eq-f .ec{color:#f4a26a}.eq-f .rc{color:#ffcc66}
-
-/* PANELS ROW */
-.prow{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
-@media(max-width:600px){.prow{grid-template-columns:1fr}}
-.panel{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:9px 12px}
-.ptitle{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--navy);border-bottom:2px solid var(--mid);padding-bottom:4px;margin-bottom:7px}
-
-/* SLIDERS */
+.tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.tab{border:1px solid var(--border);background:var(--white);color:var(--muted);font-size:11px;font-weight:600;padding:6px 14px;border-radius:6px;cursor:pointer;font-family:var(--f)}
+.tab.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+/* Paneles: todos rendered en DOM pero ocultos visualmente */
+.panel{display:none}.panel.on{display:block}
+.eqcard{background:var(--navy);color:#fff;border-radius:var(--r);padding:9px 14px;margin-bottom:10px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.eqtag{font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:#8aaad4;flex-shrink:0}
+.eqf{font-family:'Courier New',monospace;font-size:13px;font-weight:600;flex:1}
+.bc{color:#7fb3f0}.vc{color:#7ddc9a}.ec{color:#f4a26a}.rc{color:#ffcc66}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.box{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:9px 12px}
+.bttl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--navy);border-bottom:2px solid #D0DCF0;padding-bottom:4px;margin-bottom:7px}
 .slr{display:flex;align-items:center;gap:6px;margin-bottom:4px}
 .sln{font-size:11px;color:var(--muted);width:150px;flex-shrink:0;font-family:'Courier New',monospace}
 input[type=range]{flex:1;height:3px;accent-color:var(--navy);cursor:pointer}
 .slv{font-size:11px;font-weight:700;color:var(--navy);font-family:'Courier New',monospace;width:50px;text-align:right;flex-shrink:0}
-
-/* METRICS */
-.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:10px}
-@media(max-width:600px){.metrics{grid-template-columns:repeat(2,1fr)}}
-.mc{background:var(--navy);border-radius:var(--radius);padding:7px 10px}
-.mc-l{font-size:9px;text-transform:uppercase;letter-spacing:.05em;color:#8aaad4;margin-bottom:2px}
-.mc-v{font-size:15px;font-weight:700;color:#fff;font-family:'Courier New',monospace}
-
-/* CHARTS */
-.crow{display:grid;grid-template-columns:2fr 1fr;gap:10px;margin-bottom:10px}
-@media(max-width:600px){.crow{grid-template-columns:1fr}}
-.cpanel{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:9px 12px}
-.ctitle{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--navy);margin-bottom:7px}
-.cwrap{position:relative;height:210px}
-
-/* EXTRA EQ */
-.extra-eqs{margin-bottom:10px}
-.xeq{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:8px 12px;margin-bottom:8px}
-.xeq-hdr{display:flex;align-items:center;gap:8px;margin-bottom:5px}
-.xeq-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;flex:1}
-.xeq-fml{font-family:'Courier New',monospace;font-size:12px;padding:4px 8px;background:var(--light);border-radius:4px;margin-bottom:6px}
-.btn{font-size:11px;padding:4px 10px;border-radius:5px;border:none;cursor:pointer;font-family:var(--font);font-weight:600}
-.btn-add{background:var(--red);color:#fff}
-.btn-del{background:#666;color:#fff;font-size:10px;padding:3px 7px}
-.btn:hover{opacity:.85}
-
-/* TABLE */
-.tpanel{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:10px}
-.thdr{display:flex;align-items:center;justify-content:space-between;padding:6px 12px;background:var(--light);border-bottom:1px solid var(--border)}
-.ttitle{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--navy)}
+.mets{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:10px}
+.mc{background:var(--navy);border-radius:var(--r);padding:7px 10px}
+.mcl{font-size:9px;text-transform:uppercase;letter-spacing:.05em;color:#8aaad4;margin-bottom:2px}
+.mcv{font-size:15px;font-weight:700;color:#fff;font-family:'Courier New',monospace}
+.g21{display:grid;grid-template-columns:2fr 1fr;gap:10px;margin-bottom:10px}
+.cwrap{position:relative;width:100%;height:210px}
+.ctttl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--navy);margin-bottom:7px}
+.tbox{background:var(--white);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:10px}
+.thdr{padding:6px 12px;background:var(--light);border-bottom:1px solid var(--border);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--navy)}
 table{width:100%;border-collapse:collapse;font-size:11.5px}
 thead th{padding:5px 9px;text-align:left;color:var(--muted);font-weight:600;font-size:10px;background:#fafbff;border-bottom:1px solid var(--border)}
 tbody td{padding:5px 9px;border-bottom:1px solid #f0f3fa;color:var(--text)}
 tbody tr:last-child td{border-bottom:none}
-tbody tr:hover td{background:#f5f8ff}
 .num{font-family:'Courier New',monospace;text-align:right}
 .pos{color:#1a6b2e;font-weight:700}.neg{color:#8b1a1a;font-weight:700}
-
+.infobox{border-left:3px solid var(--gold);padding:10px 14px;background:var(--white);border-radius:var(--r);margin-bottom:10px;font-size:12px;line-height:1.8}
+.btn{font-size:11px;padding:4px 10px;border-radius:5px;border:none;cursor:pointer;font-family:var(--f);font-weight:600}
+.btnadd{background:var(--red);color:#fff}.btndel{background:#666;color:#fff;font-size:10px;padding:3px 7px}
+.xeq{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:8px 12px;margin-bottom:8px}
+.xhdr{display:flex;align-items:center;gap:8px;margin-bottom:5px}
+.xfml{font-family:'Courier New',monospace;font-size:12px;padding:4px 8px;background:var(--light);border-radius:4px;margin-bottom:6px}
 footer{background:var(--navy);color:#8aaad4;text-align:center;font-size:10px;padding:9px;margin-top:6px}
-footer span{color:var(--red);font-weight:700}
+footer b{color:var(--red)}
+@media(max-width:600px){.g2,.g21,.mets{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
-
-<!-- HEADER -->
 <div class="header">
-  <div class="header-top">
-    <!-- Logo SVG FEN UChile estilizado -->
-    <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <div class="htop">
+    <svg width="42" height="42" viewBox="0 0 44 44" fill="none">
       <rect width="44" height="44" rx="5" fill="#fff"/>
-      <!-- Escudo UChile simplificado: cuatro cuarteles -->
-      <rect x="2" y="2" width="19" height="19" rx="2" fill="#002F6C"/><!-- azul sup izq -->
-      <rect x="23" y="2" width="19" height="19" rx="2" fill="#C8102E"/><!-- rojo sup der -->
-      <rect x="2" y="23" width="19" height="19" rx="2" fill="#B8952A"/><!-- dorado inf izq -->
-      <rect x="23" y="23" width="19" height="19" rx="2" fill="#2E7D32"/><!-- verde inf der -->
-      <!-- Estrella central -->
-      <polygon points="22,14 23.5,19 28,19 24.5,22 25.8,27 22,24 18.2,27 19.5,22 16,19 20.5,19" fill="#fff" opacity=".9"/>
+      <rect x="2" y="2" width="19" height="19" rx="2" fill="#002F6C"/>
+      <rect x="23" y="2" width="19" height="19" rx="2" fill="#C8102E"/>
+      <rect x="2" y="23" width="19" height="19" rx="2" fill="#B8952A"/>
+      <rect x="23" y="23" width="19" height="19" rx="2" fill="#2E7D32"/>
+      <polygon points="22,13 23.8,19 30,19 25,22.5 27,29 22,25.5 17,29 19,22.5 14,19 20.2,19" fill="#fff" opacity=".92"/>
     </svg>
     <div class="hlogo">
       <span class="inst">Universidad de Chile</span>
@@ -122,388 +79,293 @@ footer span{color:var(--red);font-weight:700}
 </div>
 
 <div class="main">
-
-  <!-- TABS -->
-  <div class="model-tabs">
-    <button class="mtab active" onclick="showModel('m1')">Modelo 1 — Y = X′β + Zα + ν</button>
-    <button class="mtab" onclick="showModel('m2')">Modelo 2 — Variables irrelevantes</button>
-    <button class="mtab" onclick="showModel('m3')">Modelo 3 — Personalizado</button>
+  <div class="tabs">
+    <button class="tab on" onclick="show('p1',this)">Modelo 1 — y = X′β + Zα + ν</button>
+    <button class="tab" onclick="show('p2',this)">Modelo 2 — Variables irrelevantes</button>
+    <button class="tab" onclick="show('p3',this)">Modelo 3 — Personalizado</button>
   </div>
 
-  <!-- ══════════════════════════════════════════
-       MODELO 1: y = X'β + Zα + ν
-  ══════════════════════════════════════════ -->
-  <div class="model-panel active" id="m1">
-    <div class="eq-card">
-      <span class="eq-tag">Modelo 1</span>
-      <div class="eq-f">
-        y &nbsp;=&nbsp; X′<span class="bc" id="m1-db">β</span> &nbsp;+&nbsp; Z<span class="bc" id="m1-da">α</span> &nbsp;+&nbsp; <span class="ec">ν</span>
-        &nbsp;&nbsp;|&nbsp;&nbsp;
-        Z ~ N(<span class="vc" id="m1-dmu">μ</span>, <span class="vc" id="m1-dsg">σ</span>²) &nbsp; ν ~ N(0, <span class="ec" id="m1-dse">σν</span>²)
+  <!-- MODELO 1 -->
+  <div class="panel on" id="p1">
+    <div class="eqcard">
+      <span class="eqtag">Modelo 1</span>
+      <div class="eqf">y = X′<span class="bc" id="1db">1.50</span> + <span class="bc" id="1da">0.80</span>·<span class="vc">Z</span> + <span class="ec">ν</span> &nbsp;|&nbsp; Z~N(<span class="vc" id="1dm">2.00</span>, <span class="vc" id="1ds">1.00</span>²) &nbsp; ν~N(0,<span class="ec" id="1dn">1.00</span>²)</div>
+    </div>
+    <div class="g2">
+      <div class="box"><div class="bttl">Parámetros</div>
+        <div class="slr"><span class="sln">β (coef. X′)</span><input type="range" id="1b" min="-20" max="20" step="0.05" value="1.5" oninput="u1()"><span class="slv" id="1bv">1.50</span></div>
+        <div class="slr"><span class="sln">α (coef. Z)</span><input type="range" id="1a" min="-20" max="20" step="0.05" value="0.8" oninput="u1()"><span class="slv" id="1av">0.80</span></div>
+        <div class="slr"><span class="sln">σ_ν (error)</span><input type="range" id="1e" min="0.01" max="20" step="0.05" value="1" oninput="u1()"><span class="slv" id="1ev">1.00</span></div>
+        <div class="slr"><span class="sln">X′ (valor fijo)</span><input type="range" id="1x" min="-50" max="50" step="0.1" value="3" oninput="u1()"><span class="slv" id="1xv">3.00</span></div>
+      </div>
+      <div class="box"><div class="bttl">Z ~ N(μ, σ²)</div>
+        <div class="slr"><span class="sln">μ_Z</span><input type="range" id="1m" min="-50" max="50" step="0.1" value="2" oninput="u1()"><span class="slv" id="1mv">2.00</span></div>
+        <div class="slr"><span class="sln">σ_Z</span><input type="range" id="1s" min="0.01" max="30" step="0.05" value="1" oninput="u1()"><span class="slv" id="1sv">1.00</span></div>
+        <div class="slr"><span class="sln">Rango ±kσ</span><input type="range" id="1k" min="1" max="5" step="0.5" value="3" oninput="u1()"><span class="slv" id="1kv">3.0</span></div>
       </div>
     </div>
-    <div class="prow">
-      <div class="panel">
-        <div class="ptitle">Parámetros</div>
-        <div class="slr"><span class="sln">β (coef. X′)</span><input type="range" id="m1-beta" min="-20" max="20" step="0.05" value="1.5"><span class="slv" id="m1-vb">1.50</span></div>
-        <div class="slr"><span class="sln">α (coef. Z)</span><input type="range" id="m1-alpha" min="-20" max="20" step="0.05" value="0.8"><span class="slv" id="m1-va">0.80</span></div>
-        <div class="slr"><span class="sln">σ_ν (error)</span><input type="range" id="m1-se" min="0.01" max="20" step="0.05" value="1.0"><span class="slv" id="m1-vse">1.00</span></div>
-        <div class="slr"><span class="sln">X′ (valor fijo)</span><input type="range" id="m1-x" min="-50" max="50" step="0.1" value="3.0"><span class="slv" id="m1-vx">3.00</span></div>
-      </div>
-      <div class="panel">
-        <div class="ptitle">Distribución Z ~ N(μ, σ²)</div>
-        <div class="slr"><span class="sln">μ_Z (media)</span><input type="range" id="m1-mu" min="-50" max="50" step="0.1" value="2.0"><span class="slv" id="m1-vmu">2.00</span></div>
-        <div class="slr"><span class="sln">σ_Z (desv. std)</span><input type="range" id="m1-sig" min="0.01" max="30" step="0.05" value="1.0"><span class="slv" id="m1-vsg">1.00</span></div>
-        <div class="slr"><span class="sln">Rango ±kσ</span><input type="range" id="m1-k" min="1" max="5" step="0.5" value="3"><span class="slv" id="m1-vk">3.0</span></div>
-      </div>
+    <div class="mets">
+      <div class="mc"><div class="mcl">E[y]</div><div class="mcv" id="1ey">—</div></div>
+      <div class="mc"><div class="mcl">Var(y)</div><div class="mcv" id="1vy">—</div></div>
+      <div class="mc"><div class="mcl">SD(y)</div><div class="mcv" id="1sy">—</div></div>
+      <div class="mc"><div class="mcl">|α|·σ_Z</div><div class="mcv" id="1az">—</div></div>
     </div>
-    <div class="metrics">
-      <div class="mc"><div class="mc-l">E[y]</div><div class="mc-v" id="m1-ey">—</div></div>
-      <div class="mc"><div class="mc-l">Var(y)</div><div class="mc-v" id="m1-vy">—</div></div>
-      <div class="mc"><div class="mc-l">SD(y)</div><div class="mc-v" id="m1-sy">—</div></div>
-      <div class="mc"><div class="mc-l">|α|·σ_Z</div><div class="mc-v" id="m1-az">—</div></div>
+    <div class="g21">
+      <div class="box"><div class="ctttl">y vs Z — IC 95%</div><div class="cwrap"><canvas id="1ch"></canvas></div></div>
+      <div class="box"><div class="ctttl">Densidad Z</div><div class="cwrap"><canvas id="1cd"></canvas></div></div>
     </div>
-    <div class="crow">
-      <div class="cpanel"><div class="ctitle">y vs Z — banda IC 95%</div><div class="cwrap"><canvas id="m1-ch" role="img" aria-label="y vs Z modelo 1">y vs Z.</canvas></div></div>
-      <div class="cpanel"><div class="ctitle">Densidad Z ~ N(μ,σ²)</div><div class="cwrap"><canvas id="m1-cd" role="img" aria-label="Densidad Z modelo 1">Densidad Z.</canvas></div></div>
-    </div>
-    <div class="tpanel">
-      <div class="thdr"><span class="ttitle">Escenarios — Z en μ ± kσ</span></div>
-      <table><thead><tr><th>Escenario</th><th class="num">Z</th><th class="num">αZ</th><th class="num">β·X′</th><th class="num">E[y|Z]</th><th class="num">IC 95% inf</th><th class="num">IC 95% sup</th></tr></thead><tbody id="m1-tb"></tbody></table>
+    <div class="tbox"><div class="thdr">Escenarios — μ ± kσ</div>
+      <table><thead><tr><th>Escenario</th><th class="num">Z</th><th class="num">αZ</th><th class="num">βX′</th><th class="num">E[y|Z]</th><th class="num">IC inf</th><th class="num">IC sup</th></tr></thead><tbody id="1tb"></tbody></table>
     </div>
   </div>
 
-  <!-- ══════════════════════════════════════════
-       MODELO 2: Variables irrelevantes
-       DGP verdadero: y = X'β + ν
-       Modelo estimado: y = X'β + Zα + ν
-       MCO consistente, pierde eficiencia
-  ══════════════════════════════════════════ -->
-  <div class="model-panel" id="m2">
-    <div class="eq-card">
-      <span class="eq-tag">Modelo 2</span>
-      <div class="eq-f">
-        <span style="color:#8aaad4">DGP:</span> &nbsp;y = X′<span class="bc" id="m2-db">β</span> + <span class="ec">ν</span>
-        &nbsp;&nbsp;|&nbsp;&nbsp;
-        <span style="color:#8aaad4">Estimado:</span> &nbsp;y = X′<span class="bc" id="m2-db2">β</span> + Z<span class="rc" id="m2-da">α</span> + <span class="ec">ν</span>
-        &nbsp;(Z <span class="rc">irrelevante</span>)
+  <!-- MODELO 2 -->
+  <div class="panel" id="p2">
+    <div class="eqcard">
+      <span class="eqtag">Modelo 2</span>
+      <div class="eqf">
+        <span style="color:#8aaad4">DGP:</span> y=X′<span class="bc" id="2db">2.00</span>+<span class="ec">ν</span> &nbsp;|&nbsp;
+        <span style="color:#8aaad4">Estimado:</span> y=X′<span class="bc" id="2db2">2.00</span>+Z·<span class="rc" id="2da">0.00</span>+<span class="ec">ν</span> &nbsp;<span class="rc">(Z irrelevante)</span>
       </div>
     </div>
-    <div class="prow">
-      <div class="panel">
-        <div class="ptitle">Parámetros del DGP verdadero</div>
-        <div class="slr"><span class="sln">β (coef. X′)</span><input type="range" id="m2-beta" min="-20" max="20" step="0.05" value="2.0"><span class="slv" id="m2-vb">2.00</span></div>
-        <div class="slr"><span class="sln">σ_ν (error real)</span><input type="range" id="m2-se" min="0.01" max="20" step="0.05" value="1.5"><span class="slv" id="m2-vse">1.50</span></div>
-        <div class="slr"><span class="sln">X′ (valor fijo)</span><input type="range" id="m2-x" min="-50" max="50" step="0.1" value="3.0"><span class="slv" id="m2-vx">3.00</span></div>
-        <div class="slr"><span class="sln">n (tamaño muestra)</span><input type="range" id="m2-n" min="10" max="5000" step="10" value="100"><span class="slv" id="m2-vn">100</span></div>
+    <div class="g2">
+      <div class="box"><div class="bttl">DGP verdadero</div>
+        <div class="slr"><span class="sln">β (coef. X′)</span><input type="range" id="2b" min="-20" max="20" step="0.05" value="2" oninput="u2()"><span class="slv" id="2bv">2.00</span></div>
+        <div class="slr"><span class="sln">σ_ν (error)</span><input type="range" id="2e" min="0.01" max="20" step="0.05" value="1.5" oninput="u2()"><span class="slv" id="2ev">1.50</span></div>
+        <div class="slr"><span class="sln">X′ (valor fijo)</span><input type="range" id="2x" min="-50" max="50" step="0.1" value="3" oninput="u2()"><span class="slv" id="2xv">3.00</span></div>
+        <div class="slr"><span class="sln">n (muestra)</span><input type="range" id="2n" min="10" max="5000" step="10" value="100" oninput="u2()"><span class="slv" id="2nv">100</span></div>
       </div>
-      <div class="panel">
-        <div class="ptitle">Variable Z irrelevante ~ N(μ, σ²)</div>
-        <div class="slr"><span class="sln">μ_Z (media Z)</span><input type="range" id="m2-mu" min="-50" max="50" step="0.1" value="0.0"><span class="slv" id="m2-vmu">0.00</span></div>
-        <div class="slr"><span class="sln">σ_Z (desv. Z)</span><input type="range" id="m2-sig" min="0.01" max="30" step="0.05" value="2.0"><span class="slv" id="m2-vsg">2.00</span></div>
-        <div class="slr"><span class="sln">α̂ esperado (≈0)</span><input type="range" id="m2-alpha" min="-3" max="3" step="0.01" value="0.0"><span class="slv" id="m2-va">0.00</span></div>
-        <div class="slr"><span class="sln">Rango ±kσ</span><input type="range" id="m2-k" min="1" max="5" step="0.5" value="3"><span class="slv" id="m2-vk">3.0</span></div>
+      <div class="box"><div class="bttl">Z irrelevante ~ N(μ,σ²)</div>
+        <div class="slr"><span class="sln">μ_Z</span><input type="range" id="2m" min="-50" max="50" step="0.1" value="0" oninput="u2()"><span class="slv" id="2mv">0.00</span></div>
+        <div class="slr"><span class="sln">σ_Z</span><input type="range" id="2s" min="0.01" max="30" step="0.05" value="2" oninput="u2()"><span class="slv" id="2sv">2.00</span></div>
+        <div class="slr"><span class="sln">α̂ (≈0 en DGP)</span><input type="range" id="2a" min="-3" max="3" step="0.01" value="0" oninput="u2()"><span class="slv" id="2av">0.00</span></div>
+        <div class="slr"><span class="sln">Rango ±kσ</span><input type="range" id="2k" min="1" max="5" step="0.5" value="3" oninput="u2()"><span class="slv" id="2kv">3.0</span></div>
       </div>
     </div>
-    <div class="metrics">
-      <div class="mc"><div class="mc-l">E[y] verdadero</div><div class="mc-v" id="m2-ey">—</div></div>
-      <div class="mc"><div class="mc-l">Var(ŷ) estimado</div><div class="mc-v" id="m2-vy">—</div></div>
-      <div class="mc"><div class="mc-l">Pérd. eficiencia</div><div class="mc-v" id="m2-pe">—</div></div>
-      <div class="mc"><div class="mc-l">α̂/SE(α̂) ≈</div><div class="mc-v" id="m2-tz">—</div></div>
+    <div class="mets">
+      <div class="mc"><div class="mcl">E[y] DGP</div><div class="mcv" id="2ey">—</div></div>
+      <div class="mc"><div class="mcl">Var(y) estimado</div><div class="mcv" id="2vy">—</div></div>
+      <div class="mc"><div class="mcl">Pérd. eficiencia</div><div class="mcv" id="2pe">—</div></div>
+      <div class="mc"><div class="mcl">t(α̂) aprox.</div><div class="mcv" id="2tz">—</div></div>
     </div>
-    <div class="crow">
-      <div class="cpanel">
-        <div class="ctitle">y vs Z — DGP (azul) vs modelo con Z irrelevante (rojo)</div>
-        <div class="cwrap"><canvas id="m2-ch" role="img" aria-label="Comparación DGP vs modelo con Z irrelevante">Comparación.</canvas></div>
-      </div>
-      <div class="cpanel"><div class="ctitle">Densidad Z irrelevante</div><div class="cwrap"><canvas id="m2-cd" role="img" aria-label="Densidad Z irrelevante">Densidad Z.</canvas></div></div>
+    <div class="infobox">
+      <strong style="color:var(--navy)">Resultado teórico:</strong><br>
+      <b>① MCO consistente:</b> plim(β̂)=β y plim(α̂)=0 — Z ortogonal al error real.<br>
+      <b>② Pérdida de eficiencia:</b> Var(β̂<sub>irrestricto</sub>) ≥ Var(β̂<sub>restringido</sub>). ICs más anchos.<br>
+      <b>③ t(α̂)→0</b> cuando n→∞. Sube n con el slider para verlo.
     </div>
-    <div class="panel" style="margin-bottom:10px;border-left:3px solid var(--gold)">
-      <div class="ptitle" style="color:var(--gold)">Resultado teórico</div>
-      <p style="font-size:12px;line-height:1.7;color:var(--text)">
-        Cuando el DGP verdadero es <code>y = X′β + ν</code> pero se estima <code>y = X′β + Zα + ν</code>:<br>
-        <strong>① MCO es consistente:</strong> plim(β̂) = β y plim(α̂) = 0, porque Z es ortogonal al error real.<br>
-        <strong>② Se pierde eficiencia:</strong> Var(β̂<sub>restringido</sub>) ≤ Var(β̂<sub>irrestricto</sub>) — la varianza del estimador aumenta al incluir Z.<br>
-        <strong>③ Consecuencia práctica:</strong> IC más anchos, t-stat de α̂ ≈ 0 en muestras grandes.
-      </p>
+    <div class="g21">
+      <div class="box"><div class="ctttl">y vs Z — DGP (azul) vs estimado con Z (rojo)</div><div class="cwrap"><canvas id="2ch"></canvas></div></div>
+      <div class="box"><div class="ctttl">Densidad Z irrelevante</div><div class="cwrap"><canvas id="2cd"></canvas></div></div>
     </div>
-    <div class="tpanel">
-      <div class="thdr"><span class="ttitle">Escenarios Z — efecto sobre y estimado vs DGP</span></div>
-      <table><thead><tr><th>Escenario</th><th class="num">Z</th><th class="num">E[y] DGP</th><th class="num">E[y] estimado</th><th class="num">Sesgo α̂·Z</th><th class="num">IC 95% inf</th><th class="num">IC 95% sup</th></tr></thead><tbody id="m2-tb"></tbody></table>
+    <div class="tbox"><div class="thdr">Escenarios — efecto de Z irrelevante</div>
+      <table><thead><tr><th>Escenario</th><th class="num">Z</th><th class="num">E[y] DGP</th><th class="num">E[y] estimado</th><th class="num">Sesgo α̂Z</th><th class="num">IC inf</th><th class="num">IC sup</th></tr></thead><tbody id="2tb"></tbody></table>
     </div>
   </div>
 
-  <!-- ══════════════════════════════════════════
-       MODELO 3: Personalizado con + ecuaciones
-  ══════════════════════════════════════════ -->
-  <div class="model-panel" id="m3">
-    <div class="eq-card">
-      <span class="eq-tag">Modelo 3</span>
-      <div class="eq-f">
-        y &nbsp;=&nbsp; <span class="bc" id="m3-db">β</span>·X &nbsp;+&nbsp; <span class="bc" id="m3-da">α</span>·Z &nbsp;+&nbsp; <span class="ec">ε</span>
-        &nbsp;&nbsp;|&nbsp;&nbsp;Z ~ N(<span class="vc" id="m3-dmu">μ</span>, <span class="vc" id="m3-dsg">σ</span>²)
-      </div>
-      <button class="btn btn-add" onclick="addEq()">+ Ecuación</button>
+  <!-- MODELO 3 -->
+  <div class="panel" id="p3">
+    <div class="eqcard">
+      <span class="eqtag">Modelo 3</span>
+      <div class="eqf">y = <span class="bc" id="3db">1.50</span>·<span class="vc">X</span> + <span class="bc" id="3da">0.80</span>·<span class="vc">Z</span> + <span class="ec">ε</span> &nbsp;|&nbsp; Z~N(<span class="vc" id="3dm">2.00</span>,<span class="vc" id="3ds">1.00</span>²)</div>
+      <button class="btn btnadd" onclick="addEq()">+ Ecuación</button>
     </div>
-    <div class="prow">
-      <div class="panel">
-        <div class="ptitle">Parámetros</div>
-        <div class="slr"><span class="sln">β (coef. X)</span><input type="range" id="m3-beta" min="-20" max="20" step="0.05" value="1.5"><span class="slv" id="m3-vb">1.50</span></div>
-        <div class="slr"><span class="sln">α (coef. Z)</span><input type="range" id="m3-alpha" min="-20" max="20" step="0.05" value="0.8"><span class="slv" id="m3-va">0.80</span></div>
-        <div class="slr"><span class="sln">σ_ε (error)</span><input type="range" id="m3-se" min="0.01" max="20" step="0.05" value="1.0"><span class="slv" id="m3-vse">1.00</span></div>
-        <div class="slr"><span class="sln">X (valor fijo)</span><input type="range" id="m3-x" min="-50" max="50" step="0.1" value="3.0"><span class="slv" id="m3-vx">3.00</span></div>
+    <div class="g2">
+      <div class="box"><div class="bttl">Parámetros</div>
+        <div class="slr"><span class="sln">β (coef. X)</span><input type="range" id="3b" min="-20" max="20" step="0.05" value="1.5" oninput="u3()"><span class="slv" id="3bv">1.50</span></div>
+        <div class="slr"><span class="sln">α (coef. Z)</span><input type="range" id="3a" min="-20" max="20" step="0.05" value="0.8" oninput="u3()"><span class="slv" id="3av">0.80</span></div>
+        <div class="slr"><span class="sln">σ_ε (error)</span><input type="range" id="3e" min="0.01" max="20" step="0.05" value="1" oninput="u3()"><span class="slv" id="3ev">1.00</span></div>
+        <div class="slr"><span class="sln">X (valor fijo)</span><input type="range" id="3x" min="-50" max="50" step="0.1" value="3" oninput="u3()"><span class="slv" id="3xv">3.00</span></div>
       </div>
-      <div class="panel">
-        <div class="ptitle">Distribución Z ~ N(μ, σ²)</div>
-        <div class="slr"><span class="sln">μ_Z (media)</span><input type="range" id="m3-mu" min="-50" max="50" step="0.1" value="2.0"><span class="slv" id="m3-vmu">2.00</span></div>
-        <div class="slr"><span class="sln">σ_Z (desv. std)</span><input type="range" id="m3-sig" min="0.01" max="30" step="0.05" value="1.0"><span class="slv" id="m3-vsg">1.00</span></div>
-        <div class="slr"><span class="sln">Rango ±kσ</span><input type="range" id="m3-k" min="1" max="5" step="0.5" value="3"><span class="slv" id="m3-vk">3.0</span></div>
+      <div class="box"><div class="bttl">Z ~ N(μ, σ²)</div>
+        <div class="slr"><span class="sln">μ_Z</span><input type="range" id="3m" min="-50" max="50" step="0.1" value="2" oninput="u3()"><span class="slv" id="3mv">2.00</span></div>
+        <div class="slr"><span class="sln">σ_Z</span><input type="range" id="3s" min="0.01" max="30" step="0.05" value="1" oninput="u3()"><span class="slv" id="3sv">1.00</span></div>
+        <div class="slr"><span class="sln">Rango ±kσ</span><input type="range" id="3k" min="1" max="5" step="0.5" value="3" oninput="u3()"><span class="slv" id="3kv">3.0</span></div>
       </div>
     </div>
-    <div class="metrics">
-      <div class="mc"><div class="mc-l">E[y]</div><div class="mc-v" id="m3-ey">—</div></div>
-      <div class="mc"><div class="mc-l">Var(y)</div><div class="mc-v" id="m3-vy">—</div></div>
-      <div class="mc"><div class="mc-l">SD(y)</div><div class="mc-v" id="m3-sy">—</div></div>
-      <div class="mc"><div class="mc-l">|α|·σ_Z</div><div class="mc-v" id="m3-az">—</div></div>
+    <div class="mets">
+      <div class="mc"><div class="mcl">E[y]</div><div class="mcv" id="3ey">—</div></div>
+      <div class="mc"><div class="mcl">Var(y)</div><div class="mcv" id="3vy">—</div></div>
+      <div class="mc"><div class="mcl">SD(y)</div><div class="mcv" id="3sy">—</div></div>
+      <div class="mc"><div class="mcl">|α|·σ_Z</div><div class="mcv" id="3az">—</div></div>
     </div>
-    <div class="crow">
-      <div class="cpanel"><div class="ctitle">y vs Z — banda IC 95%</div><div class="cwrap"><canvas id="m3-ch" role="img" aria-label="y vs Z modelo 3">y vs Z.</canvas></div></div>
-      <div class="cpanel"><div class="ctitle">Densidad Z ~ N(μ,σ²)</div><div class="cwrap"><canvas id="m3-cd" role="img" aria-label="Densidad Z modelo 3">Densidad Z.</canvas></div></div>
+    <div class="g21">
+      <div class="box"><div class="ctttl">y vs Z — IC 95%</div><div class="cwrap"><canvas id="3ch"></canvas></div></div>
+      <div class="box"><div class="ctttl">Densidad Z</div><div class="cwrap"><canvas id="3cd"></canvas></div></div>
     </div>
-    <div class="extra-eqs" id="extra-eqs"></div>
-    <div class="tpanel">
-      <div class="thdr"><span class="ttitle">Escenarios — Z en μ ± kσ</span></div>
-      <table><thead><tr><th>Escenario</th><th class="num">Z</th><th class="num">αZ</th><th class="num">β·X</th><th class="num">E[y|Z]</th><th class="num">IC 95% inf</th><th class="num">IC 95% sup</th></tr></thead><tbody id="m3-tb"></tbody></table>
+    <div id="xeqs"></div>
+    <div class="tbox"><div class="thdr">Escenarios — μ ± kσ</div>
+      <table><thead><tr><th>Escenario</th><th class="num">Z</th><th class="num">αZ</th><th class="num">βX</th><th class="num">E[y|Z]</th><th class="num">IC inf</th><th class="num">IC sup</th></tr></thead><tbody id="3tb"></tbody></table>
     </div>
   </div>
-
 </div>
 
-<footer><span>FEN UChile</span> — Modelos de Regresión Lineal Múltiple · Econometría</footer>
+<footer><b>FEN UChile</b> — Econometría · Departamento de Economía · Universidad de Chile</footer>
 
 <script>
-function g(id){return document.getElementById(id)}
-function fv(id){return parseFloat(g(id).value)}
-function nPDF(x,mu,s){const z=(x-mu)/s;return Math.exp(-.5*z*z)/(s*Math.sqrt(2*Math.PI))}
+const g=id=>document.getElementById(id);
+const fv=id=>parseFloat(g(id).value);
+const nPDF=(x,mu,s)=>Math.exp(-.5*((x-mu)/s)**2)/(s*Math.sqrt(2*Math.PI));
+const NAVY='#002F6C',RED='#C8102E',GOLD='#B8952A';
 
-// ── TABS ──
-function showModel(id){
-  document.querySelectorAll('.model-panel').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.mtab').forEach(t=>t.classList.remove('active'));
-  g(id).classList.add('active');
-  event.target.classList.add('active');
-  updateAll();
-}
-
-// ── CHARTS store ──
-const charts={};
-function mkChart(id,type,data,opts){
-  if(charts[id]){charts[id].destroy()}
-  charts[id]=new Chart(g(id),{type,data,options:opts});
-  return charts[id];
-}
-function updChart(id,labels,datasets){
-  if(!charts[id])return;
-  charts[id].data.labels=labels;
-  datasets.forEach((d,i)=>{if(charts[id].data.datasets[i])charts[id].data.datasets[i].data=d});
-  charts[id].update();
-}
-
-const scaleOpts=(xt,yt)=>({
-  x:{title:{display:true,text:xt,font:{size:11}},ticks:{maxTicksLimit:7,font:{size:9}},grid:{color:'rgba(0,0,0,0.04)'}},
-  y:{title:{display:true,text:yt,font:{size:11}},ticks:{font:{size:9}},grid:{color:'rgba(0,0,0,0.04)'}}
+const scOpts=(xl,yl)=>({
+  x:{title:{display:true,text:xl,font:{size:11}},ticks:{maxTicksLimit:7,font:{size:9}},grid:{color:'rgba(0,0,0,0.04)'}},
+  y:{title:{display:true,text:yl,font:{size:11}},ticks:{font:{size:9}},grid:{color:'rgba(0,0,0,0.04)'}}
 });
 
-// ── UPDATE M1 ──
-function updateM1(){
-  const beta=fv('m1-beta'),alpha=fv('m1-alpha'),se=fv('m1-se'),xv=fv('m1-x');
-  const mu=fv('m1-mu'),sig=fv('m1-sig'),k=fv('m1-k');
-  g('m1-vb').textContent=beta.toFixed(2);g('m1-va').textContent=alpha.toFixed(2);
-  g('m1-vse').textContent=se.toFixed(2);g('m1-vx').textContent=xv.toFixed(2);
-  g('m1-vmu').textContent=mu.toFixed(2);g('m1-vsg').textContent=sig.toFixed(2);g('m1-vk').textContent=k.toFixed(1);
-  g('m1-db').textContent=beta.toFixed(2);g('m1-da').textContent=alpha.toFixed(2);
-  g('m1-dmu').textContent=mu.toFixed(2);g('m1-dsg').textContent=sig.toFixed(2);g('m1-dse').textContent=se.toFixed(2);
-  const EY=beta*xv+alpha*mu,VY=alpha*alpha*sig*sig+se*se,SY=Math.sqrt(VY);
-  g('m1-ey').textContent=EY.toFixed(3);g('m1-vy').textContent=VY.toFixed(3);
-  g('m1-sy').textContent=SY.toFixed(3);g('m1-az').textContent=Math.abs(alpha*sig).toFixed(3);
-  const zMin=mu-k*sig,zMax=mu+k*sig,N=80;
-  const zL=[],yM=[],yU=[],yLo=[];
-  for(let i=0;i<=N;i++){const z=zMin+(zMax-zMin)*i/N,y=beta*xv+alpha*z;zL.push(z.toFixed(2));yM.push(+y.toFixed(4));yU.push(+(y+1.96*se).toFixed(4));yLo.push(+(y-1.96*se).toFixed(4));}
-  if(!charts['m1-ch']){
-    mkChart('m1-ch','line',{labels:zL,datasets:[
-      {label:'IC 95% sup',data:yU,borderColor:'rgba(0,47,108,.2)',backgroundColor:'rgba(0,47,108,.07)',borderWidth:1,borderDash:[4,3],pointRadius:0,fill:'+1',tension:.25},
-      {label:'E[y|Z]',data:yM,borderColor:'#002F6C',borderWidth:2.5,pointRadius:0,fill:false,tension:.25},
-      {label:'IC 95% inf',data:yLo,borderColor:'rgba(0,47,108,.2)',borderWidth:1,borderDash:[4,3],pointRadius:0,fill:false,tension:.25},
-    ]},{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{boxWidth:9,font:{size:9}}}},scales:scaleOpts('Z','y')});
-  } else {updChart('m1-ch',zL,[yU,yM,yLo]);}
-  const dL=[],dD=[];
-  for(let i=0;i<=100;i++){const z=zMin+(zMax-zMin)*i/100;dL.push(z.toFixed(2));dD.push(+nPDF(z,mu,sig).toFixed(6));}
-  if(!charts['m1-cd']){mkChart('m1-cd','line',{labels:dL,datasets:[{label:'f(Z)',data:dD,borderColor:'#C8102E',backgroundColor:'rgba(200,16,46,.1)',borderWidth:2,pointRadius:0,fill:true,tension:.4}]},{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:scaleOpts('Z','Densidad')});}
-  else{updChart('m1-cd',dL,[dD]);}
-  const scen=[{l:'μ−3σ',z:mu-3*sig},{l:'μ−2σ',z:mu-2*sig},{l:'μ−σ',z:mu-sig},{l:'μ',z:mu},{l:'μ+σ',z:mu+sig},{l:'μ+2σ',z:mu+2*sig},{l:'μ+3σ',z:mu+3*sig}];
-  g('m1-tb').innerHTML=scen.map(s=>{const az=alpha*s.z,bx=beta*xv,ey=bx+az;return`<tr><td>${s.l}</td><td class="num">${s.z.toFixed(3)}</td><td class="num ${az>=0?'pos':'neg'}">${az.toFixed(3)}</td><td class="num">${bx.toFixed(3)}</td><td class="num ${ey>=0?'pos':'neg'}">${ey.toFixed(3)}</td><td class="num">${(ey-1.96*se).toFixed(3)}</td><td class="num">${(ey+1.96*se).toFixed(3)}</td></tr>`;}).join('');
+const CH={};
+function mkCh(id,datasets,xl,yl){
+  if(CH[id])CH[id].destroy();
+  CH[id]=new Chart(g(id),{type:'line',data:{labels:[],datasets},
+    options:{responsive:true,maintainAspectRatio:false,animation:false,
+      plugins:{legend:{labels:{boxWidth:9,font:{size:9},filter:i=>i.text!==''}}},
+      scales:scOpts(xl,yl)}});
+}
+function setCh(id,labels,arrs){
+  if(!CH[id])return;
+  CH[id].data.labels=labels;
+  arrs.forEach((d,i)=>{if(CH[id].data.datasets[i])CH[id].data.datasets[i].data=d;});
+  CH[id].update('none');
 }
 
-// ── UPDATE M2 ──
-function updateM2(){
-  const beta=fv('m2-beta'),alpha=fv('m2-alpha'),se=fv('m2-se'),xv=fv('m2-x');
-  const mu=fv('m2-mu'),sig=fv('m2-sig'),k=fv('m2-k'),n=fv('m2-n');
-  g('m2-vb').textContent=beta.toFixed(2);g('m2-va').textContent=alpha.toFixed(2);
-  g('m2-vse').textContent=se.toFixed(2);g('m2-vx').textContent=xv.toFixed(2);
-  g('m2-vmu').textContent=mu.toFixed(2);g('m2-vsg').textContent=sig.toFixed(2);
-  g('m2-vk').textContent=k.toFixed(1);g('m2-vn').textContent=n.toFixed(0);
-  g('m2-db').textContent=beta.toFixed(2);g('m2-db2').textContent=beta.toFixed(2);g('m2-da').textContent=alpha.toFixed(2);
-  // E[y] DGP verdadero
-  const EY_dgp=beta*xv;
-  // Varianza estimado: Var(y_est) = alpha^2*sigma^2 + se^2
-  const VY_est=alpha*alpha*sig*sig+se*se;
-  // Pérdida eficiencia = varianza adicional por incluir Z
-  const VY_dgp=se*se;
-  const perdEfic=VY_est-VY_dgp;
-  // t-stat aproximado de alpha en muestra n
-  const SE_alpha=se/(sig*Math.sqrt(n));
-  const t_alpha=Math.abs(alpha)/SE_alpha;
-  g('m2-ey').textContent=EY_dgp.toFixed(3);
-  g('m2-vy').textContent=VY_est.toFixed(3);
-  g('m2-pe').textContent='+'+perdEfic.toFixed(3);
-  g('m2-tz').textContent=isFinite(t_alpha)?t_alpha.toFixed(2):'∞';
-  const zMin=mu-k*sig,zMax=mu+k*sig,N=80;
-  const zL=[],yDGP=[],yEst=[],yU=[],yLo=[];
-  for(let i=0;i<=N;i++){
-    const z=zMin+(zMax-zMin)*i/N;
-    zL.push(z.toFixed(2));
-    yDGP.push(+(beta*xv).toFixed(4));// DGP: horizontal, no depende de Z
-    yEst.push(+(beta*xv+alpha*z).toFixed(4));// Estimado: incluye α̂·Z
-    yU.push(+(beta*xv+alpha*z+1.96*se).toFixed(4));
-    yLo.push(+(beta*xv+alpha*z-1.96*se).toFixed(4));
-  }
-  if(!charts['m2-ch']){
-    mkChart('m2-ch','line',{labels:zL,datasets:[
-      {label:'E[y] DGP verdadero',data:yDGP,borderColor:'#002F6C',borderWidth:2.5,pointRadius:0,fill:false,tension:0,borderDash:[6,3]},
-      {label:'E[y] estimado (con Z)',data:yEst,borderColor:'#C8102E',borderWidth:2,pointRadius:0,fill:false,tension:.2},
-      {label:'IC 95% estimado',data:yU,borderColor:'rgba(200,16,46,.2)',backgroundColor:'rgba(200,16,46,.05)',borderWidth:1,pointRadius:0,fill:'+1',tension:.2},
-      {label:'',data:yLo,borderColor:'rgba(200,16,46,.2)',borderWidth:1,pointRadius:0,fill:false,tension:.2},
-    ]},{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{boxWidth:9,font:{size:9},filter:i=>i.text!==''}}},scales:scaleOpts('Z','y')});
-  } else {updChart('m2-ch',zL,[yDGP,yEst,yU,yLo]);}
-  const dL=[],dD=[];
-  for(let i=0;i<=100;i++){const z=zMin+(zMax-zMin)*i/100;dL.push(z.toFixed(2));dD.push(+nPDF(z,mu,sig).toFixed(6));}
-  if(!charts['m2-cd']){mkChart('m2-cd','line',{labels:dL,datasets:[{label:'f(Z)',data:dD,borderColor:'#B8952A',backgroundColor:'rgba(184,149,42,.12)',borderWidth:2,pointRadius:0,fill:true,tension:.4}]},{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:scaleOpts('Z','Densidad')});}
-  else{updChart('m2-cd',dL,[dD]);}
-  const scen=[{l:'μ−3σ',z:mu-3*sig},{l:'μ−2σ',z:mu-2*sig},{l:'μ−σ',z:mu-sig},{l:'μ',z:mu},{l:'μ+σ',z:mu+sig},{l:'μ+2σ',z:mu+2*sig},{l:'μ+3σ',z:mu+3*sig}];
-  g('m2-tb').innerHTML=scen.map(s=>{
-    const ydgp=beta*xv,yest=beta*xv+alpha*s.z,sesgo=alpha*s.z;
-    return`<tr><td>${s.l}</td><td class="num">${s.z.toFixed(3)}</td><td class="num">${ydgp.toFixed(3)}</td><td class="num">${yest.toFixed(3)}</td><td class="num ${sesgo===0?'':'neg'}">${sesgo.toFixed(3)}</td><td class="num">${(yest-1.96*se).toFixed(3)}</td><td class="num">${(yest+1.96*se).toFixed(3)}</td></tr>`;
-  }).join('');
+function zR(mu,sig,k,N=80){
+  const mn=mu-k*sig,mx=mu+k*sig,L=[],V=[];
+  for(let i=0;i<=N;i++){const z=mn+(mx-mn)*i/N;L.push(z.toFixed(2));V.push(z);}
+  return{L,V};
+}
+const SC=(mu,sig)=>[{l:'μ−3σ',z:mu-3*sig},{l:'μ−2σ',z:mu-2*sig},{l:'μ−σ',z:mu-sig},{l:'μ',z:mu},{l:'μ+σ',z:mu+sig},{l:'μ+2σ',z:mu+2*sig},{l:'μ+3σ',z:mu+3*sig}];
+
+function u1(){
+  const b=fv('1b'),a=fv('1a'),e=fv('1e'),x=fv('1x'),mu=fv('1m'),sig=fv('1s'),k=fv('1k');
+  g('1bv').textContent=b.toFixed(2);g('1av').textContent=a.toFixed(2);g('1ev').textContent=e.toFixed(2);
+  g('1xv').textContent=x.toFixed(2);g('1mv').textContent=mu.toFixed(2);g('1sv').textContent=sig.toFixed(2);g('1kv').textContent=k.toFixed(1);
+  g('1db').textContent=b.toFixed(2);g('1da').textContent=a.toFixed(2);g('1dm').textContent=mu.toFixed(2);g('1ds').textContent=sig.toFixed(2);g('1dn').textContent=e.toFixed(2);
+  const EY=b*x+a*mu,VY=a*a*sig*sig+e*e;
+  g('1ey').textContent=EY.toFixed(3);g('1vy').textContent=VY.toFixed(3);g('1sy').textContent=Math.sqrt(VY).toFixed(3);g('1az').textContent=Math.abs(a*sig).toFixed(3);
+  const{L,V}=zR(mu,sig,k);
+  setCh('1ch',L,[V.map(z=>+(b*x+a*z+1.96*e).toFixed(4)),V.map(z=>+(b*x+a*z).toFixed(4)),V.map(z=>+(b*x+a*z-1.96*e).toFixed(4))]);
+  setCh('1cd',L,[V.map(z=>+nPDF(z,mu,sig).toFixed(6))]);
+  g('1tb').innerHTML=SC(mu,sig).map(s=>{const az=a*s.z,bx=b*x,ey=bx+az;
+    return`<tr><td>${s.l}</td><td class="num">${s.z.toFixed(3)}</td><td class="num ${az>=0?'pos':'neg'}">${az.toFixed(3)}</td><td class="num">${bx.toFixed(3)}</td><td class="num ${ey>=0?'pos':'neg'}">${ey.toFixed(3)}</td><td class="num">${(ey-1.96*e).toFixed(3)}</td><td class="num">${(ey+1.96*e).toFixed(3)}</td></tr>`;}).join('');
 }
 
-// ── UPDATE M3 ──
-function updateM3(){
-  const beta=fv('m3-beta'),alpha=fv('m3-alpha'),se=fv('m3-se'),xv=fv('m3-x');
-  const mu=fv('m3-mu'),sig=fv('m3-sig'),k=fv('m3-k');
-  g('m3-vb').textContent=beta.toFixed(2);g('m3-va').textContent=alpha.toFixed(2);
-  g('m3-vse').textContent=se.toFixed(2);g('m3-vx').textContent=xv.toFixed(2);
-  g('m3-vmu').textContent=mu.toFixed(2);g('m3-vsg').textContent=sig.toFixed(2);g('m3-vk').textContent=k.toFixed(1);
-  g('m3-db').textContent=beta.toFixed(2);g('m3-da').textContent=alpha.toFixed(2);
-  g('m3-dmu').textContent=mu.toFixed(2);g('m3-dsg').textContent=sig.toFixed(2);
-  const EY=beta*xv+alpha*mu,VY=alpha*alpha*sig*sig+se*se,SY=Math.sqrt(VY);
-  g('m3-ey').textContent=EY.toFixed(3);g('m3-vy').textContent=VY.toFixed(3);
-  g('m3-sy').textContent=SY.toFixed(3);g('m3-az').textContent=Math.abs(alpha*sig).toFixed(3);
-  const zMin=mu-k*sig,zMax=mu+k*sig,N=80;
-  const zL=[],yM=[],yU=[],yLo=[];
-  for(let i=0;i<=N;i++){const z=zMin+(zMax-zMin)*i/N,y=beta*xv+alpha*z;zL.push(z.toFixed(2));yM.push(+y.toFixed(4));yU.push(+(y+1.96*se).toFixed(4));yLo.push(+(y-1.96*se).toFixed(4));}
-  if(!charts['m3-ch']){
-    mkChart('m3-ch','line',{labels:zL,datasets:[
-      {label:'IC 95% sup',data:yU,borderColor:'rgba(0,47,108,.2)',backgroundColor:'rgba(0,47,108,.07)',borderWidth:1,borderDash:[4,3],pointRadius:0,fill:'+1',tension:.25},
-      {label:'E[y|Z]',data:yM,borderColor:'#002F6C',borderWidth:2.5,pointRadius:0,fill:false,tension:.25},
-      {label:'IC 95% inf',data:yLo,borderColor:'rgba(0,47,108,.2)',borderWidth:1,borderDash:[4,3],pointRadius:0,fill:false,tension:.25},
-    ]},{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{boxWidth:9,font:{size:9}}}},scales:scaleOpts('Z','y')});
-  } else{updChart('m3-ch',zL,[yU,yM,yLo]);}
-  const dL=[],dD=[];
-  for(let i=0;i<=100;i++){const z=zMin+(zMax-zMin)*i/100;dL.push(z.toFixed(2));dD.push(+nPDF(z,mu,sig).toFixed(6));}
-  if(!charts['m3-cd']){mkChart('m3-cd','line',{labels:dL,datasets:[{label:'f(Z)',data:dD,borderColor:'#C8102E',backgroundColor:'rgba(200,16,46,.1)',borderWidth:2,pointRadius:0,fill:true,tension:.4}]},{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:scaleOpts('Z','Densidad')});}
-  else{updChart('m3-cd',dL,[dD]);}
-  const scen=[{l:'μ−3σ',z:mu-3*sig},{l:'μ−2σ',z:mu-2*sig},{l:'μ−σ',z:mu-sig},{l:'μ',z:mu},{l:'μ+σ',z:mu+sig},{l:'μ+2σ',z:mu+2*sig},{l:'μ+3σ',z:mu+3*sig}];
-  g('m3-tb').innerHTML=scen.map(s=>{const az=alpha*s.z,bx=beta*xv,ey=bx+az;return`<tr><td>${s.l}</td><td class="num">${s.z.toFixed(3)}</td><td class="num ${az>=0?'pos':'neg'}">${az.toFixed(3)}</td><td class="num">${bx.toFixed(3)}</td><td class="num ${ey>=0?'pos':'neg'}">${ey.toFixed(3)}</td><td class="num">${(ey-1.96*se).toFixed(3)}</td><td class="num">${(ey+1.96*se).toFixed(3)}</td></tr>`;}).join('');
-  extraEqs.forEach(eq=>updateExtra(eq));
+function u2(){
+  const b=fv('2b'),a=fv('2a'),e=fv('2e'),x=fv('2x'),mu=fv('2m'),sig=fv('2s'),k=fv('2k'),n=fv('2n');
+  g('2bv').textContent=b.toFixed(2);g('2av').textContent=a.toFixed(2);g('2ev').textContent=e.toFixed(2);
+  g('2xv').textContent=x.toFixed(2);g('2mv').textContent=mu.toFixed(2);g('2sv').textContent=sig.toFixed(2);g('2kv').textContent=k.toFixed(1);g('2nv').textContent=n.toFixed(0);
+  g('2db').textContent=b.toFixed(2);g('2db2').textContent=b.toFixed(2);g('2da').textContent=a.toFixed(2);
+  const EY=b*x,VY_est=a*a*sig*sig+e*e,SE_a=e/(sig*Math.sqrt(n));
+  g('2ey').textContent=EY.toFixed(3);g('2vy').textContent=VY_est.toFixed(3);
+  g('2pe').textContent='+'+(a*a*sig*sig).toFixed(3);g('2tz').textContent=sig>0?Math.abs(a/SE_a).toFixed(2):'∞';
+  const{L,V}=zR(mu,sig,k);
+  setCh('2ch',L,[
+    V.map(()=>+(b*x).toFixed(4)),
+    V.map(z=>+(b*x+a*z).toFixed(4)),
+    V.map(z=>+(b*x+a*z+1.96*e).toFixed(4)),
+    V.map(z=>+(b*x+a*z-1.96*e).toFixed(4))
+  ]);
+  setCh('2cd',L,[V.map(z=>+nPDF(z,mu,sig).toFixed(6))]);
+  g('2tb').innerHTML=SC(mu,sig).map(s=>{const yd=b*x,ye=b*x+a*s.z,sb=a*s.z;
+    return`<tr><td>${s.l}</td><td class="num">${s.z.toFixed(3)}</td><td class="num">${yd.toFixed(3)}</td><td class="num">${ye.toFixed(3)}</td><td class="num ${sb===0?'':'neg'}">${sb.toFixed(3)}</td><td class="num">${(ye-1.96*e).toFixed(3)}</td><td class="num">${(ye+1.96*e).toFixed(3)}</td></tr>`;}).join('');
 }
 
-function updateAll(){updateM1();updateM2();updateM3();}
+function u3(){
+  const b=fv('3b'),a=fv('3a'),e=fv('3e'),x=fv('3x'),mu=fv('3m'),sig=fv('3s'),k=fv('3k');
+  g('3bv').textContent=b.toFixed(2);g('3av').textContent=a.toFixed(2);g('3ev').textContent=e.toFixed(2);
+  g('3xv').textContent=x.toFixed(2);g('3mv').textContent=mu.toFixed(2);g('3sv').textContent=sig.toFixed(2);g('3kv').textContent=k.toFixed(1);
+  g('3db').textContent=b.toFixed(2);g('3da').textContent=a.toFixed(2);g('3dm').textContent=mu.toFixed(2);g('3ds').textContent=sig.toFixed(2);
+  const EY=b*x+a*mu,VY=a*a*sig*sig+e*e;
+  g('3ey').textContent=EY.toFixed(3);g('3vy').textContent=VY.toFixed(3);g('3sy').textContent=Math.sqrt(VY).toFixed(3);g('3az').textContent=Math.abs(a*sig).toFixed(3);
+  const{L,V}=zR(mu,sig,k);
+  setCh('3ch',L,[V.map(z=>+(b*x+a*z+1.96*e).toFixed(4)),V.map(z=>+(b*x+a*z).toFixed(4)),V.map(z=>+(b*x+a*z-1.96*e).toFixed(4))]);
+  setCh('3cd',L,[V.map(z=>+nPDF(z,mu,sig).toFixed(6))]);
+  g('3tb').innerHTML=SC(mu,sig).map(s=>{const az=a*s.z,bx=b*x,ey=bx+az;
+    return`<tr><td>${s.l}</td><td class="num">${s.z.toFixed(3)}</td><td class="num ${az>=0?'pos':'neg'}">${az.toFixed(3)}</td><td class="num">${bx.toFixed(3)}</td><td class="num ${ey>=0?'pos':'neg'}">${ey.toFixed(3)}</td><td class="num">${(ey-1.96*e).toFixed(3)}</td><td class="num">${(ey+1.96*e).toFixed(3)}</td></tr>`;}).join('');
+  xEqs.forEach(eq=>uxeq(eq));
+}
 
-// ── ECUACIONES EXTRA (Modelo 3) ──
-let extraEqs=[];let eqN=0;
-const EQC=['#B8952A','#2E7D32','#6a1a6b','#8b4513','#1a4a6b'];
+function show(id,btn){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  g(id).classList.add('on');btn.classList.add('on');
+  setTimeout(()=>Object.values(CH).forEach(c=>{try{c.resize();}catch(ex){}}),30);
+}
+
+// Extra ecuaciones
+let xEqs=[],eqN=0;
+const EQC=[GOLD,'#2E7D32','#6a1a6b','#8b4513'];
 function addEq(){
-  eqN++;
-  const id='xeq'+eqN,color=EQC[(eqN-1)%EQC.length];
-  const eq={id,label:'Ecuación adicional '+eqN,color,chart:null};
-  extraEqs.push(eq);
-  const div=document.createElement('div');
-  div.className='xeq';div.id='div-'+id;
-  div.innerHTML=`
-    <div class="xeq-hdr">
-      <span class="xeq-lbl" style="color:${color}">${eq.label}</span>
-      <div class="xeq-fml">y₂ = <span id="xb-${id}">0.50</span>·W + <span id="xg-${id}">1.00</span>·V + ε₂ &nbsp;|&nbsp; V~N(<span id="xm-${id}">0</span>, <span id="xs-${id}">1.5</span>²) &nbsp; ρ(Z,V)=<span id="xr-${id}">0.30</span></div>
-      <button class="btn btn-del" onclick="removeEq('${id}')">✕</button>
+  eqN++;const id='x'+eqN;const color=EQC[(eqN-1)%EQC.length];
+  const eq={id,color};xEqs.push(eq);
+  const div=document.createElement('div');div.className='xeq';div.id='xd'+id;
+  div.innerHTML=`<div class="xhdr"><span style="font-size:10px;font-weight:700;color:${color};flex:1">Ecuación adicional ${eqN}</span><button class="btn btndel" onclick="rmEq('${id}')">✕</button></div>
+  <div class="xfml">y₂=<span id="xfb${id}">0.50</span>·W+<span id="xfg${id}">1.00</span>·V+ε₂ | V~N(<span id="xfm${id}">0</span>,<span id="xfs${id}">1.5</span>²) ρ=<span id="xfr${id}">0.30</span></div>
+  <div class="g2" style="margin-bottom:8px">
+    <div>
+      <div class="slr"><span class="sln" style="width:115px">β₂ (coef. W)</span><input type="range" id="xb${id}" min="-20" max="20" step="0.05" value="0.5" oninput="uxeq(xEqs.find(e=>e.id==='${id}'))"><span class="slv" id="xbv${id}">0.50</span></div>
+      <div class="slr"><span class="sln" style="width:115px">γ (coef. V)</span><input type="range" id="xg${id}" min="-20" max="20" step="0.05" value="1" oninput="uxeq(xEqs.find(e=>e.id==='${id}'))"><span class="slv" id="xgv${id}">1.00</span></div>
+      <div class="slr"><span class="sln" style="width:115px">ρ (correl. Z,V)</span><input type="range" id="xr${id}" min="-0.99" max="0.99" step="0.01" value="0.3" oninput="uxeq(xEqs.find(e=>e.id==='${id}'))"><span class="slv" id="xrv${id}">0.30</span></div>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:7px">
-      <div>
-        <div class="slr"><span class="sln" style="width:115px">β₂ (coef. W)</span><input type="range" id="xbr-${id}" min="-20" max="20" step="0.05" value="0.5"><span class="slv" id="xbv-${id}">0.50</span></div>
-        <div class="slr"><span class="sln" style="width:115px">γ (coef. V)</span><input type="range" id="xgr-${id}" min="-20" max="20" step="0.05" value="1.0"><span class="slv" id="xgv-${id}">1.00</span></div>
-        <div class="slr"><span class="sln" style="width:115px">ρ (correl. Z,V)</span><input type="range" id="xrr-${id}" min="-0.99" max="0.99" step="0.01" value="0.3"><span class="slv" id="xrv-${id}">0.30</span></div>
-      </div>
-      <div>
-        <div class="slr"><span class="sln" style="width:115px">μ_V</span><input type="range" id="xmr-${id}" min="-50" max="50" step="0.1" value="0"><span class="slv" id="xmv-${id}">0.00</span></div>
-        <div class="slr"><span class="sln" style="width:115px">σ_V</span><input type="range" id="xsr-${id}" min="0.01" max="30" step="0.05" value="1.5"><span class="slv" id="xsv-${id}">1.50</span></div>
-      </div>
+    <div>
+      <div class="slr"><span class="sln" style="width:115px">μ_V</span><input type="range" id="xm${id}" min="-50" max="50" step="0.1" value="0" oninput="uxeq(xEqs.find(e=>e.id==='${id}'))"><span class="slv" id="xmv${id}">0.00</span></div>
+      <div class="slr"><span class="sln" style="width:115px">σ_V</span><input type="range" id="xs${id}" min="0.01" max="30" step="0.05" value="1.5" oninput="uxeq(xEqs.find(e=>e.id==='${id}'))"><span class="slv" id="xsv${id}">1.50</span></div>
     </div>
-    <div style="position:relative;height:150px"><canvas id="xch-${id}" role="img" aria-label="${eq.label}">Gráfico extra.</canvas></div>`;
-  g('extra-eqs').appendChild(div);
-  ['xbr','xgr','xrr','xmr','xsr'].forEach(p=>{const el=g(p+'-'+id);if(el)el.addEventListener('input',()=>updateExtra(eq));});
-  updateExtra(eq);
+  </div>
+  <div style="position:relative;height:150px"><canvas id="xc${id}"></canvas></div>`;
+  g('xeqs').appendChild(div);
+  CH['xc'+id]=new Chart(g('xc'+id),{type:'line',data:{labels:[],datasets:[{label:'E[y₂|Z]',data:[],borderColor:color,backgroundColor:color+'22',borderWidth:2,pointRadius:0,fill:true,tension:.25}]},options:{responsive:true,maintainAspectRatio:false,animation:false,plugins:{legend:{display:false}},scales:scOpts('Z','y₂')}});
+  uxeq(eq);
 }
-function removeEq(id){
-  const idx=extraEqs.findIndex(e=>e.id===id);
-  if(idx===-1)return;
-  if(extraEqs[idx].chart)extraEqs[idx].chart.destroy();
-  extraEqs.splice(idx,1);
-  const el=g('div-'+id);if(el)el.remove();
+function rmEq(id){
+  const i=xEqs.findIndex(e=>e.id===id);if(i===-1)return;
+  if(CH['xc'+id]){CH['xc'+id].destroy();delete CH['xc'+id];}
+  xEqs.splice(i,1);const el=g('xd'+id);if(el)el.remove();
 }
-function updateExtra(eq){
-  const id=eq.id;
-  const beta2=parseFloat(g('xbr-'+id)?.value||0.5);
-  const gamma=parseFloat(g('xgr-'+id)?.value||1.0);
-  const rho=parseFloat(g('xrr-'+id)?.value||0.3);
-  const mu2=parseFloat(g('xmr-'+id)?.value||0);
-  const sig2=parseFloat(g('xsr-'+id)?.value||1.5);
-  if(g('xbv-'+id))g('xbv-'+id).textContent=beta2.toFixed(2);
-  if(g('xgv-'+id))g('xgv-'+id).textContent=gamma.toFixed(2);
-  if(g('xrv-'+id))g('xrv-'+id).textContent=rho.toFixed(2);
-  if(g('xmv-'+id))g('xmv-'+id).textContent=mu2.toFixed(2);
-  if(g('xsv-'+id))g('xsv-'+id).textContent=sig2.toFixed(2);
-  if(g('xb-'+id))g('xb-'+id).textContent=beta2.toFixed(2);
-  if(g('xg-'+id))g('xg-'+id).textContent=gamma.toFixed(2);
-  if(g('xm-'+id))g('xm-'+id).textContent=mu2.toFixed(2);
-  if(g('xs-'+id))g('xs-'+id).textContent=sig2.toFixed(2);
-  if(g('xr-'+id))g('xr-'+id).textContent=rho.toFixed(2);
-  const mu=fv('m3-mu'),sig=fv('m3-sig'),k=fv('m3-k');
-  const zMin=mu-k*sig,zMax=mu+k*sig;
-  const zL=[],yD=[];
-  for(let i=0;i<=80;i++){
-    const z=zMin+(zMax-zMin)*i/80;
-    const v=mu2+rho*(sig2/Math.max(sig,0.01))*(z-mu);
-    zL.push(z.toFixed(2));yD.push(+(beta2*3+gamma*v).toFixed(4));
-  }
-  const canvas=g('xch-'+id);if(!canvas)return;
-  if(eq.chart){eq.chart.data.labels=zL;eq.chart.data.datasets[0].data=yD;eq.chart.update();}
-  else{eq.chart=new Chart(canvas,{type:'line',data:{labels:zL,datasets:[{label:'E[y₂|Z]',data:yD,borderColor:eq.color,backgroundColor:eq.color+'22',borderWidth:2,pointRadius:0,fill:true,tension:.25}]},{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:scaleOpts('Z (compartida)','y₂')}});}
+function uxeq(eq){
+  if(!eq)return;const id=eq.id;
+  const b2=fv('xb'+id),gm=fv('xg'+id),rho=fv('xr'+id),mu2=fv('xm'+id),sig2=fv('xs'+id);
+  if(g('xbv'+id))g('xbv'+id).textContent=b2.toFixed(2);
+  if(g('xgv'+id))g('xgv'+id).textContent=gm.toFixed(2);
+  if(g('xrv'+id))g('xrv'+id).textContent=rho.toFixed(2);
+  if(g('xmv'+id))g('xmv'+id).textContent=mu2.toFixed(2);
+  if(g('xsv'+id))g('xsv'+id).textContent=sig2.toFixed(2);
+  if(g('xfb'+id))g('xfb'+id).textContent=b2.toFixed(2);
+  if(g('xfg'+id))g('xfg'+id).textContent=gm.toFixed(2);
+  if(g('xfm'+id))g('xfm'+id).textContent=mu2.toFixed(2);
+  if(g('xfs'+id))g('xfs'+id).textContent=sig2.toFixed(2);
+  if(g('xfr'+id))g('xfr'+id).textContent=rho.toFixed(2);
+  const mu=fv('3m'),sig=fv('3s'),k=fv('3k');
+  const{L,V}=zR(mu,sig,k);
+  const yD=V.map(z=>{const v=mu2+rho*(sig2/Math.max(sig,0.01))*(z-mu);return+(b2*3+gm*v).toFixed(4);});
+  setCh('xc'+id,L,[yD]);
 }
 
-// ── Listeners ──
-['m1-beta','m1-alpha','m1-se','m1-x','m1-mu','m1-sig','m1-k'].forEach(id=>{const el=g(id);if(el)el.addEventListener('input',updateM1);});
-['m2-beta','m2-alpha','m2-se','m2-x','m2-mu','m2-sig','m2-k','m2-n'].forEach(id=>{const el=g(id);if(el)el.addEventListener('input',updateM2);});
-['m3-beta','m3-alpha','m3-se','m3-x','m3-mu','m3-sig','m3-k'].forEach(id=>{const el=g(id);if(el)el.addEventListener('input',updateM3);});
+// INIT — crear todos los charts aunque estén ocultos
+window.addEventListener('load',()=>{
+  mkCh('1ch',[
+    {label:'IC 95% sup',data:[],borderColor:'rgba(0,47,108,.2)',backgroundColor:'rgba(0,47,108,.07)',borderWidth:1,borderDash:[4,3],pointRadius:0,fill:'+1',tension:.25},
+    {label:'E[y|Z]',data:[],borderColor:NAVY,borderWidth:2.5,pointRadius:0,fill:false,tension:.25},
+    {label:'IC 95% inf',data:[],borderColor:'rgba(0,47,108,.2)',borderWidth:1,borderDash:[4,3],pointRadius:0,fill:false,tension:.25}
+  ],'Z','y');
+  mkCh('1cd',[{label:'f(Z)',data:[],borderColor:RED,backgroundColor:'rgba(200,16,46,.1)',borderWidth:2,pointRadius:0,fill:true,tension:.4}],'Z','Densidad');
 
-updateAll();
+  mkCh('2ch',[
+    {label:'DGP verdadero',data:[],borderColor:NAVY,borderWidth:2.5,pointRadius:0,fill:false,tension:0,borderDash:[6,3]},
+    {label:'Estimado con Z',data:[],borderColor:RED,borderWidth:2,pointRadius:0,fill:false,tension:.2},
+    {label:'IC 95%',data:[],borderColor:'rgba(200,16,46,.2)',backgroundColor:'rgba(200,16,46,.05)',borderWidth:1,pointRadius:0,fill:'+1',tension:.2},
+    {label:'',data:[],borderColor:'rgba(200,16,46,.2)',borderWidth:1,pointRadius:0,fill:false,tension:.2}
+  ],'Z','y');
+  mkCh('2cd',[{label:'f(Z)',data:[],borderColor:GOLD,backgroundColor:'rgba(184,149,42,.12)',borderWidth:2,pointRadius:0,fill:true,tension:.4}],'Z','Densidad');
+
+  mkCh('3ch',[
+    {label:'IC 95% sup',data:[],borderColor:'rgba(0,47,108,.2)',backgroundColor:'rgba(0,47,108,.07)',borderWidth:1,borderDash:[4,3],pointRadius:0,fill:'+1',tension:.25},
+    {label:'E[y|Z]',data:[],borderColor:NAVY,borderWidth:2.5,pointRadius:0,fill:false,tension:.25},
+    {label:'IC 95% inf',data:[],borderColor:'rgba(0,47,108,.2)',borderWidth:1,borderDash:[4,3],pointRadius:0,fill:false,tension:.25}
+  ],'Z','y');
+  mkCh('3cd',[{label:'f(Z)',data:[],borderColor:RED,backgroundColor:'rgba(200,16,46,.1)',borderWidth:2,pointRadius:0,fill:true,tension:.4}],'Z','Densidad');
+
+  u1();u2();u3();
+});
 </script>
 </body>
 </html>
